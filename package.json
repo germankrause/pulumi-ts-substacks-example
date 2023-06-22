@@ -1,0 +1,14 @@
+{
+    "name": "af-test",
+    "main": "dist/index.js",
+    "devDependencies": {
+        "@types/node": "18"
+    },
+    "dependencies": {
+        "@pulumi/command": "^0.7.1",
+        "@pulumi/docker": "^4.1.0",
+        "@pulumi/kubernetes": "^3.0.0",
+        "@pulumi/pulumi": "^3.0.0",
+        "typescript": "5.1.3"
+    }
+}

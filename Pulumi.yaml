@@ -1,0 +1,6 @@
+name: example
+runtime:
+  name: nodejs
+  options:
+    typescript: false
+stack: example
