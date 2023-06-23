@@ -10,8 +10,8 @@ As described in [this pulumi blog post](https://www.pulumi.com/blog/micro-stacks
 This results in a growing complexity of the project and/or a lot of copy-paste.
 Instead what we can do is create a single project/stack and split the stack's program into multiple steps. This would eliminate the drawbacks mentioned above while keeping the benefits of the micro-stacks approach.
 **But there is a catch.** 
-The pulumi CLI doesn't support this approach out of the box. Also, you can not pass some arguments to the program like usual `node ./index.js build` to get the arg from `process.argv` and know that this `pulumi up` should only build something.
-The Automation API could be used to solve this, but this would take all the benefits of the pulumi CLI away. So reinventing the CLI is not an option.
+The pulumi CLI doesn't support this approach out of the box. Also, you can not pass some arguments to the program like usual `node ./index.js build` to get the arg from `process.argv` and know that this `pulumi up` should only run the build step.
+The Automation API could be used to solve this, but this would make things too complex and take all the benefits of the pulumi CLI away. So reinventing the CLI is not an option.
 
 ### Solution
 Pulumi stack names may contain alphanumeric characters, hyphens, underscores, and periods. We'll use this to add another level of project scoping: substacks. 
@@ -48,10 +48,12 @@ For the usage example see `./src/index.ts`. What it does is requires every subst
 That's it for the program. But we still need to run some long commands to get it working. To make it easier there is a simple bash script `./substack.bash` that accepts the substack name and the rest of the arguments to pass to the pulumi CLI. It gets the current stack name, joins it with the substack name, and passes the rest to pulumi. To make it a bit easier to use, we can create an alias (see the setup section). Now we can create a stack as usual, and manage the substacks with `substack <substack-name> <pulumi-args>`
 
 ### Results
-- Previously I had to wait more than 2 minutes for `pulumi up` to complete after each tweak in the infrastructure configurations because it needed to build a lot of docker images and recheck other things even when I'm sure that nothing changed from the previous run. This was very time-consuming and annoying. Now I can skip the entire build step and make progress much faster. 
-- There is a trick in building the images. The stack reference allows getting the previous outputs from the same substack, so I have more control over the build process: instead of building everything every time, I only build images where the tag changes. 
-- The deploy step sometimes was deciding to replace some k8s deployments and waiting for the build to complete before creating the replacement, which caused unnecessary downtime. Now I can build images ahead of time and deploy them in a single step, so the downtime is minimized.
+- A pulumi stack is managed as usual, but the program is split into multiple steps that can be run separately.
 - The advantages of the micro-stacks are kept while the code is DRY and easy to maintain.
+*Personal impression:*
+- Previously I had to wait more than 2 minutes for `pulumi up` to complete after each tweak in the infrastructure configurations because it needed to build a lot of docker images and recheck other things even when I'm sure that nothing changed from the previous run. This was very time-consuming and annoying. Now I can skip the entire build step and make progress much faster. 
+- The deploy step sometimes was deciding to replace some k8s deployments and wait for the build to complete before creating the replacement, which caused unnecessary downtime. Now I can build images ahead of time and then deploy them in as a separate step, so the downtime is minimized.
+- There is a trick in building the images. The stack reference allows getting the previous outputs from the same substack, so I have more control over the build process: instead of building everything every time, I only build images where the tag changes.
 
 ## Test
 ### Prerequisites
