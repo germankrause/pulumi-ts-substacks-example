@@ -1,5 +1,5 @@
 # Description
-Example of pulumi [micro-stacks](https://www.pulumi.com/docs/using-pulumi/organizing-projects-stacks/#micro-stacks) approach implementation with typescript.
+Example of pulumi [micro-stacks](https://www.pulumi.com/docs/using-pulumi/organizing-projects-stacks/#micro-stacks) approach implementation with typescript. The Kubernetes-based infrastructure is considered here, but the approach could be applied to any stack that needs to be run in multiple steps.
 
 ### Motivation
 As described in [this pulumi blog post](https://www.pulumi.com/blog/micro-stacks-organizing-pulumi-programs/), we could achieve the micro-stacks approach by creating separate pulumi projects. This looks cool at first glance, but it has some drawbacks:
@@ -52,8 +52,8 @@ That's it for the program. But we still need to run some long commands to get it
 - The advantages of the micro-stacks are kept while the code is DRY and easy to maintain.
 #### Personal impression
 - Previously I had to wait more than 2 minutes for `pulumi up` to complete after each tweak in the infrastructure configurations because it needed to build a lot of docker images and recheck other things even when I'm sure that nothing changed from the previous run. This was very time-consuming and annoying. Now I can skip the entire build step and make progress much faster. 
-- The deploy step sometimes was deciding to replace some k8s deployments and wait for the build to complete before creating the replacement, which caused unnecessary downtime. Now I can build images ahead of time and then deploy them in as a separate step, so the downtime is minimized.
-- There is a trick in building the images. The stack reference allows getting the previous outputs from the same substack, so I have more control over the build process: instead of building everything every time, I only build images where the tag changes.
+- The deploy step sometimes was deciding to replace some k8s deployments and wait for the build to complete before creating the replacement, which caused unnecessary downtime. Now I can build images ahead of time and then deploy them as a separate step, so the downtime is minimized.
+- There is a trick in building the images. The stack reference allows getting the previous outputs from the same substack, so I have more control over the build process: instead of building everything every time, I only build an image if its tag is changed.
 
 ## Test
 ### Prerequisites
